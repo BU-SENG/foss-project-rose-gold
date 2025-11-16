@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}My Profile - Local Job Connect{% endblock %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div style="background: var(--bg-white); padding: 40px; border-radius: 20px; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 32px;">
+                <div style="display: flex; gap: 24px; align-items: center;">
+                    <div class="user-profile" style="width: 80px; height: 80px; font-size: 32px;">
+                        {{ current_user.full_name[0].upper() }}
+                    </div>
+                    <div>
+                        <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 4px;">{{ current_user.full_name }}</h1>
+                        <p style="color: var(--text-gray); font-size: 16px;">
+                            <i class="fas fa-{{ 'user' if current_user.role == 'job_seeker' else 'building' }}"></i>
+                            {{ current_user.role|replace('_', ' ')|title }}
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </a>
+            </div>
+
+            <div style="display: grid; gap: 24px;">
+                <div style="padding: 20px; background: var(--bg-light); border-radius: 12px;">
+                    <h3 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text-gray); margin-bottom: 12px;">
+                        <i class="fas fa-envelope"></i> Contact Information
+                    </h3>
+                    <p style="margin-bottom: 8px;"><strong>Email:</strong> {{ current_user.email }}</p>
+                    <p style="margin-bottom: 8px;"><strong>Phone:</strong> {{ current_user.phone or 'Not provided' }}</p>
+                    <p><strong>Address:</strong> {{ current_user.address }}, {{ current_user.city }}, {{ current_user.zip_code }}</p>
+                </div>
+
+                {% if current_user.role == 'employer' %}
+                <div style="padding: 20px; background: var(--bg-light); border-radius: 12px;">
+                    <h3 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text-gray); margin-bottom: 12px;">
+                        <i class="fas fa-building"></i> Company Information
+                    </h3>
+                    <p style="margin-bottom: 8px;"><strong>Company:</strong> {{ current_user.company_name }}</p>
+                    <p><strong>Description:</strong> {{ current_user.company_description or 'Not provided' }}</p>
+                </div>
+                {% endif %}
+
+                <div style="padding: 20px; background: var(--bg-light); border-radius: 12px;">
+                    <h3 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text-gray); margin-bottom: 12px;">
+                        <i class="fas fa-info-circle"></i> Account Details
+                    </h3>
+                    <p style="margin-bottom: 8px;"><strong>Member since:</strong> {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+                    <p><strong>Last login:</strong> {{ current_user.last_login.strftime('%B %d, %Y at %I:%M %p') if current_user.last_login else 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
