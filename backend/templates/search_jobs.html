@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Search Jobs - Local Job Connect{% endblock %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div class="search-header">
+        <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">
+            <i class="fas fa-search"></i> Find Your Perfect Local Job
+        </h1>
+        <p style="color: var(--text-gray); margin-bottom: 24px;">Discover opportunities right in your neighborhood</p>
+        
+        <form method="GET" action="{{ url_for('search_jobs') }}" class="search-bar">
+            <input type="text" name="keyword" value="{{ keyword }}" placeholder="Job title, keywords, or company" class="search-input">
+            <select name="category" class="search-input" style="max-width: 200px;">
+                <option value="">All Categories</option>
+                <option value="Technology" {{ 'selected' if category == 'Technology' }}>Technology</option>
+                <option value="Healthcare" {{ 'selected' if category == 'Healthcare' }}>Healthcare</option>
+                <option value="Retail" {{ 'selected' if category == 'Retail' }}>Retail</option>
+                <option value="Education" {{ 'selected' if category == 'Education' }}>Education</option>
+            </select>
+            <input type="number" name="radius" value="{{ radius }}" min="1" max="100" placeholder="Radius (km)" class="search-input" style="max-width: 150px;">
+            <button type="submit" class="btn btn-primary btn-large">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </form>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 32px 0 24px;">
+        <h2 style="font-size: 24px; font-weight: 700;">
+            <i class="fas fa-briefcase"></i> {{ jobs_with_distance|length }} Job{{ 's' if jobs_with_distance|length != 1 else '' }} Found
+        </h2>
+        <div style="color: var(--text-gray); font-size: 14px;">
+            <i class="fas fa-map-marker-alt"></i> Within {{ radius }} km
+        </div>
+    </div>
+
+    {% if jobs_with_distance %}
+    <div class="job-list">
+        {% for item in jobs_with_distance %}
+        <div class="job-card">
+            <div class="job-header">
+                <div style="display: flex; gap: 16px; align-items: start; flex: 1;">
+                    <div class="job-company-logo">
+                        {{ item.job.employer.company_name[0] }}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 class="job-title">{{ item.job.title }}</h3>
+                        <p class="job-company">
+                            <i class="fas fa-building"></i> {{ item.job.employer.company_name }}
+                        </p>
+                    </div>
+                </div>
+                <span class="job-distance">
+                    <i class="fas fa-map-marker-alt"></i> {{ item.distance }} km away
+                </span>
+            </div>
+            
+            <div class="job-details">
+                <div class="job-detail">
+                    <i class="fas fa-briefcase"></i>
+                    {{ item.job.employment_type }}
+                </div>
+                <div class="job-detail">
+                    <i class="fas fa-tag"></i>
+                    {{ item.job.category }}
+                </div>
+                {% if item.job.salary_min and item.job.salary_max %}
+                <div class="job-detail">
+                    <i class="fas fa-money-bill-wave"></i>
+                    ₦{{ '{:,.0f}'.format(item.job.salary_min) }} - ₦{{ '{:,.0f}'.format(item.job.salary_max) }}
+                </div>
+                {% endif %}
+                <div class="job-detail">
+                    <i class="fas fa-map-pin"></i>
+                    {{ item.job.city }}
+                </div>
+            </div>
+            
+            <p class="job-description">{{ item.job.description[:200] }}...</p>
+            
+            <div class="job-actions">
+                <a href="{{ url_for('view_job', job_id=item.job.id) }}" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> View Details
+                </a>
+                <form method="POST" action="{{ url_for('save_job', job_id=item.job.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-heart"></i> Save
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: var(--bg-white); padding: 80px 40px; border-radius: 16px; text-align: center; box-shadow: var(--shadow-sm);">
+        <i class="fas fa-search" style="font-size: 64px; color: var(--text-gray); opacity: 0.3; margin-bottom: 24px;"></i>
+        <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">No jobs found</h3>
+        <p style="color: var(--text-gray); font-size: 16px; margin-bottom: 24px;">
+            Try adjusting your search criteria or increase the radius
+        </p>
+        <a href="{{ url_for('search_jobs') }}" class="btn btn-primary">
+            <i class="fas fa-redo"></i> Clear Filters
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

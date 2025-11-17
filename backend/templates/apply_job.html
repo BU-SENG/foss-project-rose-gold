@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Apply for {{ job.title }} - Local Job Connect{% endblock %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div class="form-container">
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div class="job-company-logo" style="width: 64px; height: 64px; font-size: 24px; margin: 0 auto 16px;">
+                {{ job.employer.company_name[0] }}
+            </div>
+            <h2>Apply for {{ job.title }}</h2>
+            <p style="color: var(--text-gray);">{{ job.employer.company_name }}</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('apply_job', job_id=job.id) }}">
+            <div class="form-group">
+                <label for="resume_id"><i class="fas fa-file-pdf"></i> Select Resume *</label>
+                <select name="resume_id" id="resume_id" required>
+                    <option value="">Choose a resume...</option>
+                    {% for resume in resumes %}
+                    <option value="{{ resume.id }}">{{ resume.original_filename }}</option>
+                    {% endfor %}
+                </select>
+                {% if not resumes %}
+                <small style="color: var(--danger-red);">
+                    <i class="fas fa-exclamation-triangle"></i> You need to upload a resume first. 
+                    <a href="{{ url_for('job_seeker_dashboard') }}" style="color: var(--primary-blue);">Go to dashboard</a>
+                </small>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="cover_letter"><i class="fas fa-envelope"></i> Cover Letter (Optional)</label>
+                <textarea name="cover_letter" id="cover_letter" rows="8" placeholder="Tell the employer why you're a great fit for this position...
+
+Highlight your relevant experience, skills, and enthusiasm for the role."></textarea>
+                <small>A well-written cover letter can increase your chances significantly!</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-large" {{ 'disabled' if not resumes }}>
+                <i class="fas fa-paper-plane"></i> Submit Application
+            </button>
+        </form>
+        
+        <p class="form-footer">
+            <a href="{{ url_for('view_job', job_id=job.id) }}">
+                <i class="fas fa-arrow-left"></i> Back to job details
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}
