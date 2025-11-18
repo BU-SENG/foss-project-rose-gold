@@ -163,3 +163,122 @@ class SavedJob(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# ============================================================================
+# ROUTES - AUTHENTICATION
+# ============================================================================
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    # Redirect if already logged in
+    if current_user.is_authenticated:
+        flash('You are already logged in. Logout first to create a new account.', 'warning')
+        if current_user.role == 'employer':
+            return redirect(url_for('employer_dashboard'))
+        return redirect(url_for('job_seeker_dashboard'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        role = request.form.get('role')
+        full_name = request.form.get('full_name')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        city = request.form.get('city')
+        zip_code = request.form.get('zip_code')
+        
+        if password != confirm_password:
+            flash('Passwords do not match!', 'error')
+            return redirect(url_for('register'))
+        
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long!', 'error')
+            return redirect(url_for('register'))
+        
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered!', 'error')
+            return redirect(url_for('register'))
+        
+        lat, lng = geocode_address(address, city, zip_code)
+        
+        if not lat or not lng:
+            flash('Could not verify address. Please check and try again.', 'error')
+            return redirect(url_for('register'))
+        
+        user = User(
+            email=email,
+            role=role,
+            full_name=full_name,
+            phone=phone,
+            address=address,
+            city=city,
+            zip_code=zip_code,
+            latitude=lat,
+            longitude=lng
+        )
+        user.set_password(password)
+        
+        if role == 'employer':
+            user.company_name = request.form.get('company_name')
+            user.company_description = request.form.get('company_description')
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        flash('You are already logged in.', 'info')
+        if current_user.role == 'employer':
+            return redirect(url_for('employer_dashboard'))
+        return redirect(url_for('job_seeker_dashboard'))
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and user.check_password(password):
+            login_user(user)
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+            
+            if user.role == 'employer':
+                return redirect(url_for('employer_dashboard'))
+            else:
+                return redirect(url_for('job_seeker_dashboard'))
+        else:
+            flash('Invalid email or password!', 'error')
+    
+    return render_template('login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('index'))
+
+
+# ============================================================================
+# INITIALIZE DATABASE AND RUN APP
+# ============================================================================
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
