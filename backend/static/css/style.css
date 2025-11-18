@@ -138,7 +138,101 @@ body {
     gap: 24px;
     margin-top: 32px;
 }
+/* ============================================================================
+   JOB CARDS - Modern Design
+   ============================================================================ */
 
+.job-list {
+    display: grid;
+    gap: 20px;
+}
+
+.job-card {
+    background: var(--bg-white);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s;
+    position: relative;
+}
+
+.job-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-light);
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 16px;
+}
+
+.job-company-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--primary-blue);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.job-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+}
+
+.job-company {
+    color: var(--text-gray);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.job-distance {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-light));
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.job-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    color: var(--text-gray);
+    font-size: 14px;
+}
+
+.job-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.job-description {
+    color: var(--text-gray);
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.job-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
 .stat-card {
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
     padding: 24px;
