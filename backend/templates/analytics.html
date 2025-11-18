@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Analytics - Local Job Connect{% endblock %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
+        <p>Real-time insights into your hiring performance</p>
+        
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_jobs }}</div>
+                <div class="stat-label">Total Job Posts</div>
+                <div style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">
+                    {{ active_jobs }} active, {{ paused_jobs }} paused, {{ archived_jobs }} archived
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_applications }}</div>
+                <div class="stat-label">Total Applications</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-users"></i> All time
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ acceptance_rate }}%</div>
+                <div class="stat-label">Acceptance Rate</div>
+                <div class="stat-change {{ 'positive' if acceptance_rate > 10 else 'negative' }}">
+                    <i class="fas fa-{{ 'arrow-up' if acceptance_rate > 10 else 'arrow-down' }}"></i>
+                    {{ 'Above avg' if acceptance_rate > 10 else 'Below avg' }} (10% industry avg)
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ (total_applications / total_jobs)|round|int if total_jobs > 0 else 0 }}</div>
+                <div class="stat-label">Avg. Applications/Job</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; margin-top: 32px;">
+        <!-- Applications by Month -->
+        <div style="background: var(--bg-white); padding: 32px; border-radius: 16px; box-shadow: var(--shadow-sm);">
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">
+                <i class="fas fa-chart-bar"></i> Applications Timeline
+            </h2>
+            
+            {% if apps_by_month %}
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                {% set max_count = apps_by_month.values()|max %}
+                {% for month, count in apps_by_month.items() %}
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600; color: var(--text-dark);">{{ month }}</span>
+                        <span style="color: var(--primary-blue); font-weight: 700;">{{ count }} application{{ 's' if count != 1 else '' }}</span>
+                    </div>
+                    <div style="width: 100%; height: 10px; background: var(--bg-light); border-radius: 5px; overflow: hidden;">
+                        <div style="width: {{ (count / max_count * 100)|round|int }}%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), var(--primary-light)); border-radius: 5px; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 60px 20px; color: var(--text-gray);">
+                <i class="fas fa-chart-bar" style="font-size: 48px; opacity: 0.3; margin-bottom: 16px;"></i>
+                <p>No application data yet. Post your first job to see analytics!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Application Status Breakdown -->
+        <div style="background: var(--bg-white); padding: 32px; border-radius: 16px; box-shadow: var(--shadow-sm);">
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">
+                <i class="fas fa-tasks"></i> Status Breakdown
+            </h2>
+            
+            {% if apps_by_status %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for status, count in apps_by_status.items() %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-light); border-radius: 8px;">
+                    <div>
+                        <span class="badge badge-{{ 'success' if status == 'accepted' else 'info' if status == 'interview' else 'warning' if status == 'under_review' else 'danger' if status == 'rejected' else 'secondary' }}">
+                            {{ status|replace('_', ' ')|title }}
+                        </span>
+                    </div>
+                    <div style="font-weight: 700; color: var(--text-dark);">
+                        {{ count }} ({{ (count / total_applications * 100)|round|int }}%)
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-gray);">
+                <p style="font-size: 14px;">No status data available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 32px;">
+        <!-- Interview Rate -->
+        <div style="background: var(--bg-white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--primary-blue);">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <div>
+                    <div style="font-size: 14px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Interview Rate</div>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--primary-blue);">{{ interview_rate }}%</div>
+                </div>
+                <i class="fas fa-handshake" style="font-size: 32px; color: var(--primary-blue); opacity: 0.3;"></i>
+            </div>
+            <p style="font-size: 13px; color: var(--text-gray);">
+                {{ (interview_rate / 100 * total_applications)|round|int if total_applications > 0 else 0 }} candidates reached interview stage
+            </p>
+        </div>
+
+        <!-- Response Rate -->
+        <div style="background: var(--bg-white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--success-green);">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <div>
+                    <div style="font-size: 14px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Response Rate</div>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--success-green);">{{ response_rate }}%</div>
+                </div>
+                <i class="fas fa-reply" style="font-size: 32px; color: var(--success-green); opacity: 0.3;"></i>
+            </div>
+            <p style="font-size: 13px; color: var(--text-gray);">
+                You've reviewed {{ (response_rate / 100 * total_applications)|round|int if total_applications > 0 else 0 }} out of {{ total_applications }} applications
+            </p>
+        </div>
+
+        <!-- Avg Response Time -->
+        <div style="background: var(--bg-white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--warning-yellow);">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <div>
+                    <div style="font-size: 14px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Avg. Response Time</div>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--warning-yellow);">{{ avg_response_time }}</div>
+                </div>
+                <i class="fas fa-clock" style="font-size: 32px; color: var(--warning-yellow); opacity: 0.3;"></i>
+            </div>
+            <p style="font-size: 13px; color: var(--text-gray);">
+                Days to respond to applications
+            </p>
+        </div>
+
+        <!-- Most Popular Job -->
+        <div style="background: var(--bg-white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--secondary-blue);">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <div>
+                    <div style="font-size: 14px; color: var(--text-gray); font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">Most Popular Job</div>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--text-dark); line-height: 1.3;">{{ most_popular_job[0][:30] }}{{ '...' if most_popular_job[0]|length > 30 else '' }}</div>
+                </div>
+                <i class="fas fa-star" style="font-size: 32px; color: var(--secondary-blue); opacity: 0.3;"></i>
+            </div>
+            <p style="font-size: 13px; color: var(--text-gray);">
+                {{ most_popular_job[1] }} application{{ 's' if most_popular_job[1] != 1 else '' }} received
+            </p>
+        </div>
+    </div>
+
+    <!-- Insights & Recommendations -->
+    <div style="background: var(--bg-white); padding: 32px; border-radius: 16px; box-shadow: var(--shadow-sm); margin-top: 32px;">
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 24px;">
+            <i class="fas fa-lightbulb"></i> AI-Powered Insights
+        </h2>
+        
+        <div style="display: grid; gap: 16px;">
+            {% if response_rate < 50 %}
+            <div style="padding: 16px; background: #fff3cd; border-left: 4px solid var(--warning-yellow); border-radius: 8px;">
+                <h4 style="font-weight: 700; color: #856404; margin-bottom: 8px;">
+                    <i class="fas fa-exclamation-triangle"></i> Low Response Rate Detected
+                </h4>
+                <p style="color: #856404; font-size: 14px;">
+                    You're only responding to {{ response_rate }}% of applications. Try to review and update application statuses more frequently to improve candidate experience.
+                </p>
+            </div>
+            {% endif %}
+
+            {% if acceptance_rate > 20 %}
+            <div style="padding: 16px; background: #d1fae5; border-left: 4px solid var(--success-green); border-radius: 8px;">
+                <h4 style="font-weight: 700; color: #065f46; margin-bottom: 8px;">
+                    <i class="fas fa-check-circle"></i> Excellent Hiring Performance
+                </h4>
+                <p style="color: #065f46; font-size: 14px;">
+                    Your acceptance rate of {{ acceptance_rate }}% is well above the industry average! You're successfully converting applications into hires.
+                </p>
+            </div>
+            {% endif %}
+
+            {% if avg_response_time > 7 %}
+            <div style="padding: 16px; background: #fecaca; border-left: 4px solid var(--danger-red); border-radius: 8px;">
+                <h4 style="font-weight: 700; color: #991b1b; margin-bottom: 8px;">
+                    <i class="fas fa-hourglass-half"></i> Slow Response Time
+                </h4>
+                <p style="color: #991b1b; font-size: 14px;">
+                    Average response time is {{ avg_response_time }} days. Top employers respond within 3-5 days. Quick responses improve candidate quality and acceptance rates.
+                </p>
+            </div>
+            {% endif %}
+
+            {% if interview_rate > 15 %}
+            <div style="padding: 16px; background: #dbeafe; border-left: 4px solid var(--primary-blue); border-radius: 8px;">
+                <h4 style="font-weight: 700; color: #1e40af; margin-bottom: 8px;">
+                    <i class="fas fa-thumbs-up"></i> Great Interview Conversion
+                </h4>
+                <p style="color: #1e40af; font-size: 14px;">
+                    {{ interview_rate }}% of applications are progressing to interviews. You're effectively screening candidates!
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
