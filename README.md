@@ -125,16 +125,3 @@ Then open `http://127.0.0.1:5000/` in your browser.
 ## Contributing
 
 If you'd like to contribute, please open an issue or create a pull request. Keep changes small and focused and include a description of the problem and how to reproduce it.
-
-## License
-
-This project is provided as-is. Add a license if you plan to open-source the repository (MIT recommended).
-
----
-
-If you'd like, I can also:
-
-- add a minimal `backend/README-dev.md` with development commands,
-- create a simple `Makefile` / PowerShell script for common tasks (venv, install, run), or
-- add a `LICENSE` file (MIT) — tell me which and I will add it.
-
