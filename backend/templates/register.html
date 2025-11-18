@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - Local Job Connect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2>Create Your Account</h2>
+        <p style="text-align: center; color: var(--text-gray); margin-bottom: 32px;">
+            Join Local Job Connect to find nearby jobs or local talent.
+        </p>
+        
+        <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+            <div class="form-tabs">
+                <button type="button" class="tab-btn active" data-role="job_seeker">
+                    <i class="fas fa-user"></i> Job Seeker
+                </button>
+                <button type="button" class="tab-btn" data-role="employer">
+                    <i class="fas fa-building"></i> Employer
+                </button>
+            </div>
+            
+            <input type="hidden" name="role" id="roleInput" value="job_seeker">
+            
+            <div class="form-group">
+                <label for="full_name"><i class="fas fa-user"></i> Full Name *</label>
+                <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email Address *</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="08012345678">
+            </div>
+            
+            <div class="form-group">
+                <label for="address"><i class="fas fa-map-marker-alt"></i> Street Address *</label>
+                <input type="text" id="address" name="address" placeholder="15 Awolowo Road" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" id="city" name="city" placeholder="Lagos" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="zip_code">ZIP Code *</label>
+                    <input type="text" id="zip_code" name="zip_code" placeholder="101233" required>
+                </div>
+            </div>
+            
+            <!-- Employer-specific fields -->
+            <div id="employerFields" style="display: none;">
+                <div class="form-group">
+                    <label for="company_name"><i class="fas fa-building"></i> Company Name *</label>
+                    <input type="text" id="company_name" name="company_name" placeholder="Your company name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="company_description">Company Description</label>
+                    <textarea id="company_description" name="company_description" rows="3" placeholder="Brief description of your company"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password *</label>
+                <input type="password" id="password" name="password" placeholder="Create a strong password" required minlength="8">
+                <small>Minimum 8 characters with uppercase, lowercase, and special characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password"><i class="fas fa-lock"></i> Confirm Password *</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full btn-large">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+        
+        <p class="form-footer">
+            Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    // Handle role tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const role = this.dataset.role;
+            document.getElementById('roleInput').value = role;
+            
+            const employerFields = document.getElementById('employerFields');
+            if (role === 'employer') {
+                employerFields.style.display = 'block';
+                document.getElementById('company_name').required = true;
+            } else {
+                employerFields.style.display = 'none';
+                document.getElementById('company_name').required = false;
+            }
+        });
+    });
+    
+    // Password validation
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            return;
+        }
+        
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        
+        if (!hasUpper || !hasLower || !hasSpecial) {
+            e.preventDefault();
+            alert('Password must contain uppercase, lowercase, and special characters!');
+            return;
+        }
+    });
+</script>
+{% endblock %}
