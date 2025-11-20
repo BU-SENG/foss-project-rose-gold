@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Local Job Connect{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container-small">
+        <h2>Welcome Back</h2>
+        <p style="text-align: center; color: var(--text-gray); margin-bottom: 32px;">
+            Login to continue your local job connection.
+        </p>
+        
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full btn-large">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+        
+        <div style="text-align: center; margin: 24px 0; color: var(--text-gray);">OR</div>
+        
+        <a href="{{ url_for('register') }}" class="btn btn-secondary btn-full btn-large">
+            <i class="fas fa-user-plus"></i> Create New Account
+        </a>
+        
+        <p class="form-footer">
+            Don't have an account? <a href="{{ url_for('register') }}">Sign up here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

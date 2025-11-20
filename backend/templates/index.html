@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Local Job Connect{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>Connecting You to Jobs Within Your Community</h1>
+            <p class="hero-subtitle">Find local opportunities fast. Build stronger local economies. Reduce commute time and strengthen your neighborhood.</p>
+            
+            {% if not current_user.is_authenticated %}
+            <div class="hero-cta">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-large">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary btn-large">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="hero-image"></div>
+    </div>
+</div>
+
+<div class="container" style="padding: 80px 0;">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto 60px;">
+        <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 16px;">How It Works</h2>
+        <p style="font-size: 18px; color: var(--text-gray);">Discover the easiest way to connect with local talent and opportunities.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+        <div style="text-align: center;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #1e3a8a); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; font-size: 32px;">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 12px;">Local Job Search</h3>
+            <p style="color: var(--text-gray); line-height: 1.6;">Easily search and filter for jobs available right in your neighborhood.</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; font-size: 32px;">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 12px;">For Job Seekers & Employers</h3>
+            <p style="color: var(--text-gray); line-height: 1.6;">A dedicated platform for both individuals seeking work and companies looking to hire.</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: white; font-size: 32px;">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 12px;">Location-based Matching</h3>
+            <p style="color: var(--text-gray); line-height: 1.6;">Our smart algorithm connects you with the most relevant opportunities based on your location.</p>
+        </div>
+    </div>
+</div>
+
+<div style="background: var(--bg-white); padding: 80px 0; margin-top: 40px;">
+    <div class="container" style="text-align: center;">
+        <h2 style="font-size: 36px; font-weight: 700; margin-bottom: 20px;">Ready to Get Started?</h2>
+        <p style="font-size: 18px; color: var(--text-gray); margin-bottom: 40px;">Whether you're looking for work or hiring local talent, we've got you covered</p>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('register') }}?role=job_seeker" class="btn btn-primary btn-large">
+                <i class="fas fa-user"></i> I'm Looking for a Job
+            </a>
+            <a href="{{ url_for('register') }}?role=employer" class="btn btn-primary btn-large">
+                <i class="fas fa-building"></i> I'm Hiring
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

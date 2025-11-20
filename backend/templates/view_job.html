@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} - Local Job Connect{% endblock %}
+{% block content %}
+<div class="container" style="padding: 40px 0;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <a href="{{ url_for('search_jobs') }}" style="color: var(--primary-blue); text-decoration: none; font-weight: 600; margin-bottom: 24px; display: inline-block;">
+            <i class="fas fa-arrow-left"></i> Back to Search
+        </a>
+        
+        <div style="background: var(--bg-white); padding: 40px; border-radius: 20px; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; gap: 24px; margin-bottom: 32px;">
+                <div class="job-company-logo" style="width: 80px; height: 80px; font-size: 32px;">
+                    {{ job.employer.company_name[0] }}
+                </div>
+                <div style="flex: 1;">
+                    <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">{{ job.title }}</h1>
+                    <p style="font-size: 18px; color: var(--text-gray); margin-bottom: 12px;">
+                        <i class="fas fa-building"></i> {{ job.employer.company_name }}
+                    </p>
+                    {% if distance %}
+                    <span class="badge badge-info" style="font-size: 14px; padding: 8px 16px;">
+                        <i class="fas fa-map-marker-alt"></i> {{ distance }} km from you
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 24px; background: var(--bg-light); border-radius: 12px; margin-bottom: 32px;">
+                <div>
+                    <div style="color: var(--text-gray); font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Employment Type</div>
+                    <div style="font-weight: 600; color: var(--text-dark);">
+                        <i class="fas fa-briefcase"></i> {{ job.employment_type }}
+                    </div>
+                </div>
+                <div>
+                    <div style="color: var(--text-gray); font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Category</div>
+                    <div style="font-weight: 600; color: var(--text-dark);">
+                        <i class="fas fa-tag"></i> {{ job.category }}
+                    </div>
+                </div>
+                {% if job.salary_min and job.salary_max %}
+                <div>
+                    <div style="color: var(--text-gray); font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Salary Range</div>
+                    <div style="font-weight: 600; color: var(--success-green);">
+                        <i class="fas fa-money-bill-wave"></i> ₦{{ '{:,.0f}'.format(job.salary_min) }} - ₦{{ '{:,.0f}'.format(job.salary_max) }}
+                    </div>
+                </div>
+                {% endif %}
+                <div>
+                    <div style="color: var(--text-gray); font-size: 13px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Location</div>
+                    <div style="font-weight: 600; color: var(--text-dark);">
+                        <i class="fas fa-map-pin"></i> {{ job.city }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 32px;">
+                <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">
+                    <i class="fas fa-file-alt"></i> Job Description
+                </h3>
+                <p style="line-height: 1.8; color: var(--text-dark); white-space: pre-wrap;">{{ job.description }}</p>
+            </div>
+
+            <div style="margin-bottom: 32px;">
+                <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">
+                    <i class="fas fa-map-marker-alt"></i> Location Details
+                </h3>
+                <p style="color: var(--text-gray);">
+                    <i class="fas fa-location-arrow"></i> {{ job.street_address }}, {{ job.city }}, {{ job.zip_code }}
+                </p>
+            </div>
+
+            {% if current_user.role == 'job_seeker' %}
+            <div style="border-top: 2px solid var(--border-light); padding-top: 32px;">
+                {% if not already_applied %}
+                <div style="display: flex; gap: 12px;">
+                    <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-primary btn-large" style="flex: 1;">
+                        <i class="fas fa-paper-plane"></i> Apply Now
+                    </a>
+                    {% if not is_saved %}
+                    <form method="POST" action="{{ url_for('save_job', job_id=job.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-secondary btn-large">
+                            <i class="fas fa-heart"></i> Save Job
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div style="background: #d1fae5; color: #065f46; padding: 20px; border-radius: 12px; text-align: center; font-weight: 600;">
+                    <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 8px;"></i>
+                    <div>You have already applied to this job</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
